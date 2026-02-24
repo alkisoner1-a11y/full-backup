@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alkis Portfolio</title>
+    <meta name="description" content="Design partner focusing on crisp experiences." />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        nitro: {
+                            black: '#050505',
+                            dark: '#0a0a0a',
+                            gray: '#1f1f1f',
+                            text: '#f0f0f0',
+                            muted: '#888888',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'reveal': 'reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        reveal: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)', filter: 'blur(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(6deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(6deg)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #f0f0f0;
+        }
+
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+    </style>
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
+</head>
+
+<body class="bg-nitro-black text-nitro-text font-sans selection:bg-white/20 selection:text-white">
+
+    <div id="root" class="min-h-screen"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // ==========================================
+        // ICONS (Replaced Lucide imports with SVG components)
+        // ==========================================
+        const IconWrapper = ({ children, className, ...props }) => (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={className}
+                {...props}
+            >
+                {children}
+            </svg>
+        );
+
+        const MenuIcon = (props) => (
+            <IconWrapper {...props}><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></IconWrapper>
+        );
+        const XIcon = (props) => (
+            <IconWrapper {...props}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></IconWrapper>
+        );
+        const ArrowDown = (props) => (
+            <IconWrapper {...props}><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></IconWrapper>
+        );
+        const ArrowUpRight = (props) => (
+            <IconWrapper {...props}><path d="M7 7h10v10" /><path d="M7 17 17 7" /></IconWrapper>
+        );
+        const ArrowRight = (props) => (
+            <IconWrapper {...props}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></IconWrapper>
+        );
+        const ArrowLeft = (props) => (
+            <IconWrapper {...props}><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></IconWrapper>
+        );
+        const Mail = (props) => (
+            <IconWrapper {...props}><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></IconWrapper>
+        );
+        const Facebook = (props) => (
+            <IconWrapper {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></IconWrapper>
+        );
+        const Linkedin = (props) => (
+            <IconWrapper {...props}><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></IconWrapper>
+        );
+
+        // ==========================================
+        // CONSTANTS
+        // ==========================================
+
+        const ROLES = ["Graphic", "Web", "Product", "Interactive"];
+        const LOGO_URL = "https://picsum.photos/40/40?grayscale";
+        const CONTACT_EMAIL = "mailto:info@alkisdesigns.com";
+
+        const FALLBACK_PROJECTS = [
+            {
+                id: '1',
+                title: 'street work',
+                category: 'Brand Identity',
+                year: '2025',
+                description: 'Urban observation series.',
+                bgColor: 'bg-[#FF4D00]',
+                textColor: 'text-black',
+                image: 'assets/streetwork/pigeoncover.png',
+                details: {
+                    client: 'Personal',
+                    services: 'brand identity',
+                    challenge: 'Designing for Human Connection',
+                    problemTitle: 'THE CHALLENGE',
+                    problemBody: 'The challenge was to design a corporate identity for the Street Work team that speaks directly to the people they support: individuals experiencing homelessness. The goal was not to sell a service, but to create a visual language that is human, direct, and immediately understood by those in need.',
+                    solution: 'A Universal Sign of Trust',
+                    solutionTitle: 'THE SYMBOL',
+                    solutionBody: (
+                        <ul className="list-none space-y-4 text-gray-400">
+                            <li><strong className="text-white">The Symbol:</strong> We chose the dove as the central icon—a universal symbol of peace, solidarity, and support.</li>
+                            <li><strong className="text-white">Trust & Recognition:</strong> It acts as a friendly, approachable beacon that is easy for the community to recognize and trust instantly.</li>
+                            <li><strong className="text-white">Visual Language:</strong> We stripped away non-essentials to focus on clarity, ensuring the identity is accessible and welcoming.</li>
+                        </ul>
+                    ),
+                    images: [
+                        {
+                            url: 'assets/streetwork/streetworkhorizontallogo.png',
+                            layout: 'full',
+                            caption: 'Primary logotype horizontal.'
+                        },
+                        {
+                            url: 'assets/streetwork/gridlogo.png',
+                            layout: 'half',
+                            caption: 'Grid logo foundation'
+                        },
+                        {
+                            url: 'assets/streetwork/blackwhite.png',
+                            layout: 'half',
+                            caption: 'Black and white version'
+                        },
+                        {
+                            url: 'assets/streetwork/collors.png',
+                            layout: 'split',
+                            caption: 'Primery collors'
+                        },
+                        {
+                            url: 'assets/streetwork/magazine.png',
+                            layout: 'half',
+                            caption: 'Magazine page.'
+                        },
+                        {
+                            url: 'assets/streetwork/tshirt.png',
+                            layout: 'half',
+                            caption: 't-shiert design.'
+                        },
+                        {
+                            url: 'assets/streetwork/horizontalcerqularlogo.png',
+                            layout: 'split',
+                            caption: 'Horizontal logo'
+                        }
+                    ]
+                }
+            },
+            {
+                id: '2',
+                title: 'independent states',
+                category: 'Poster',
+                year: '2024',
+                description: 'Clean water initiative brand identity.',
+                bgColor: 'bg-[#FFFFFF]',
+                textColor: 'text-[#0000FF]',
+                image: 'assets/indipentantstate/mockup.png',
+                details: {
+                    client: 'Personal project',
+                    services: 'Poster design for theatrical play',
+                    challenge: 'Typography as the Protagonist',
+                    problemTitle: 'THE CHALLENGE',
+                    problemBody: 'The objective was to create a visual identity for the play Independent States (ANEΞAPTHTA KPATH) at Theatro Chora. The brief was strict: convey the narrative\'s mystery and atmosphere using only typography—forcing the letters themselves to act as the visual centerpiece without relying on traditional imagery.',
+                    solution: 'Three Visions of Tension',
+                    solutionTitle: 'THE CONCEPT',
+                    solutionBody: (
+                        <ul className="list-none space-y-4 text-gray-400">
+                            <li><strong className="text-white">The Falling 'A':</strong> We dropped the letter 'A' to create visual instability. Phonetically, it represents a cry of pain ('aaaa...'), symbolizing the protagonist's fatal heart condition.</li>
+                            <li><strong className="text-white">Motion Blur:</strong> A blurred effect visualizes the theme of secrecy, representing concealed information and words that should remain unspoken.</li>
+                            <li><strong className="text-white">Ransom Note Aesthetic:</strong> Using cut-out letters on a textured background evokes anonymous correspondence and underground communication, immediately setting a thriller tone.</li>
+                        </ul>
+                    ),
+                    images: [
+                        {
+                            url: 'assets/indipentantstate/1d.pdf',
+                            layout: 'full',
+                            caption: 'Main exhibition poster series displayed in sequence.'
+                        },
+                        {
+                            url: 'assets/indipentantstate/2.png',
+                            layout: 'split',
+                            caption: 'Detail of typography. We used a custom fluid simulation to distort the letters.'
+                        },
+                        {
+                            url: 'assets/indipentantstate/Untitled-1.png',
+                            layout: 'half',
+                            caption: 'Alternative colorway exploration.'
+                        }
+                    ]
+                }
+            },
+            {
+                id: '3',
+                title: 'icons 4 good',
+                category: 'UI/UX',
+                year: '2023',
+                description: 'Mobile app for healthy snack delivery.',
+                bgColor: 'bg-[#C2F970]',
+                textColor: 'text-black',
+                image: 'assets/underconstruction/aa.png',
+                details: {
+                    client: 'Snackify Inc.',
+                    services: 'App Design, UX Research',
+                    challenge: 'People want healthy snacks but buy junk food because it looks more fun.',
+                    solution: 'We gave kale chips the same visual desirability as Doritos through bold colors and gamified ordering.',
+                    images: [
+                        {
+                            url: 'https://images.unsplash.com/photo-1621951753015-740c699ab970?q=80&w=2670&auto=format&fit=crop',
+                            layout: 'full',
+                            caption: 'Main dashboard and discovery feed.'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1541592106381-b31e9674c96b?q=80&w=2670&auto=format&fit=crop',
+                            layout: 'half',
+                            caption: 'Onboarding flow screens.'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?q=80&w=2670&auto=format&fit=crop',
+                            layout: 'half',
+                            caption: 'Product detail view with nutritional info.'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?q=80&w=2670&auto=format&fit=crop',
+                            layout: 'split',
+                            caption: 'Gamification elements were introduced to reward healthy streaks.'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1599599810769-bcde5a1645f7?q=80&w=2532&auto=format&fit=crop',
+                            layout: 'half',
+                            caption: 'User profile and settings.'
+                        },
+                        {
+                            url: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?q=80&w=2515&auto=format&fit=crop',
+                            layout: 'half',
+                            caption: 'Checkout experience.'
+                        }
+                    ]
+                }
+            },
+            {
+                id: '4',
+                title: 'DADA',
+                category: 'Book Typesetting & Layout',
+                year: '2026',
+                description: 'Meditation retreat visual language.',
+                bgColor: 'bg-[#E0CCBB]',
+                textColor: 'text-[#2A2A2A]',
+                image: 'assets/book/1.webp',
+                details: {
+                    client: 'University Project',
+                    services: 'Book Typesetting',
+                    challenge: 'Dada: The Movement of Rupture (Greek Edition)',
+                    problemTitle: 'PROJECT OVERVIEW',
+                    problemSubheader: 'Role: Book Cover Design, Art Direction, & Interior Typesetting',
+                    problemBody: 'I designed the complete visual identity for this Greek edition of Edward S. Campbell’s work on Dadaism. The goal was to balance the chaotic, avant-garde nature of the Dada movement with the structure required for a readable academic text.',
+                    solution: 'Structure meets Chaos',
+                    solutionTitle: 'KEY DESIGN FEATURES',
+                    solutionBody: (
+                        <ul className="list-none space-y-4 text-gray-400">
+                            <li><strong className="text-white">Asymmetrical Grid System:</strong> I utilized a wide outer margin to house footnotes and citations, keeping the main body text clean and uninterrupted.</li>
+                            <li><strong className="text-white">Typography:</strong> A pairing of bold sans-serif headers for impact with a classic serif typeface for legibility in the body text.</li>
+                            <li><strong className="text-white">Visual Rhythm:</strong> Images of Dadaist artworks are integrated into the text flow to create visual breaks.</li>
+                            <li><strong className="text-white">Cover Design:</strong> A minimalist, typographic cover that uses high contrast and negative space to reflect the book’s modern subject matter.</li>
+                        </ul>
+                    ),
+                    images: [
+
+                        {
+                            url: 'assets/book/2.webp',
+                            layout: 'half',
+                            caption: 'Interior signage and wayfinding.'
+                        },
+                        {
+                            url: 'assets/book/3.webp',
+                            layout: 'half',
+                            caption: 'Textural details of the materials used.'
+                        },
+                        {
+                            url: 'assets/book/4.webp',
+                            layout: 'full',
+                            caption: 'Lobby area and reception desk.'
+                        },
+                        {
+                            url: 'assets/book/5.webp',
+                            layout: 'full',
+                            caption: 'Meditation room ambiance.'
+                        },
+                        {
+                            url: 'assets/book/6.webp',
+                            layout: 'full',
+                            caption: 'Common areas for guests.'
+                        },
+                        {
+                            url: 'assets/book/40-41.jpg',
+                            layout: 'half',
+                            caption: ''
+                        },
+                        {
+                            url: 'assets/book/40-412.jpg',
+                            layout: 'half',
+                            caption: ''
+                        }
+                    ]
+                }
+            }
+        ];
+
+        const FALLBACK_PRINTS = [
+            {
+                id: 1,
+                title: "Volume 01: Origins",
+                type: "Magazine",
+                price: "$35",
+                size: "8.5 x 11 in",
+                description: "A 120-page exploration of digital minimalism and the origins of interface design. Features exclusive interviews, high-fidelity spreads, and a curated look at the history of pixels.",
+                specs: ["120 Pages", "120gsm Uncoated Paper", "Soft Touch Cover", "Printed in Italy"],
+                image: "assets/underconstruction/aa.png",
+                previewImages: [
+                    "https://images.unsplash.com/photo-1544731612-de7f96afe55f?q=80&w=2670&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1555513903-a28a38148b32?q=80&w=2670&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=2670&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1550953683-146316719001?q=80&w=2670&auto=format&fit=crop"
+                ]
+            },
+            {
+                id: 2,
+                title: "Chromosphere",
+                type: "Art Print",
+                price: "$140",
+                size: "18 x 24 in",
+                description: "Limited edition archival pigment print. 'Chromosphere' captures the gradient of light as it passes through a digital prism, rendered in stunning 8K detail.",
+                specs: ["Limited Edition of 50", "Hahnemühle Photo Rag", "Signed & Numbered", "Unframed"],
+                image: "assets/underconstruction/aa.png",
+                previewImages: [
+                    "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2670&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=2670&auto=format&fit=crop"
+                ]
+            },
+            {
+                id: 3,
+                title: "Volume 02: Void",
+                type: "Magazine",
+                price: "$40",
+                size: "8.5 x 11 in",
+                description: "The second issue of our quarterly publication. 'Void' investigates negative space in architecture and typography. Includes a fold-out poster and essays from leading modernists.",
+                specs: ["140 Pages", "Gloss Laminate Detail", "Perfect Bound", "Includes Poster"],
+                image: "assets/underconstruction/aa.png",
+                previewImages: [
+                    "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=2612&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1559139265-d05543c7263b?q=80&w=2672&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=2730&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1621360841013-c768371e93cf?q=80&w=2540&auto=format&fit=crop"
+                ]
+            },
+            {
+                id: 4,
+                title: "Neon Void",
+                type: "Art Print",
+                price: "$160",
+                size: "20 x 20 in",
+                description: "A study in color and darkness. This piece serves as a focal point for any minimal space, offering deep blacks and vibrant cyan highlights.",
+                specs: ["Open Edition", "Matte Finish", "200gsm Paper", "Ships in Tube"],
+                image: "assets/underconstruction/aa.png",
+                previewImages: [
+                    "https://images.unsplash.com/photo-1502444330042-d1a1ddf9bb5b?q=80&w=2673&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2670&auto=format&fit=crop"
+                ]
+            },
+            {
+                id: 5,
+                title: "Glitch 004",
+                type: "Poster",
+                price: "$130",
+                size: "16 x 24 in",
+                description: "Visualizing data corruption as art. Part of the 'Entropy' series, this print captures the moment a video signal degrades into abstract beauty.",
+                specs: ["Screen Print", "3-Color", "French Paper Co. Stock", "Signed"],
+                image: "assets/underconstruction/aa.png",
+                previewImages: [
+                    "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=2574&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop"
+                ]
+            },
+            {
+                id: 6,
+                title: "Smoke Signal",
+                type: "Art Print",
+                price: "$150",
+                size: "18 x 24 in",
+                description: "Ethereal forms created through fluid dynamics simulation. A calming, monochromatic piece suitable for office or studio environments.",
+                specs: ["Giclée Print", "Archival Ink", "Texture Paper", "Authenticity Certificate"],
+                image: "assets/underconstruction/aa.png",
+                previewImages: [
+                    "https://images.unsplash.com/photo-1481819613568-3701cbc70156?q=80&w=2680&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1532439773200-e186835a643c?q=80&w=2670&auto=format&fit=crop"
+                ]
+            }
+        ];
+
+        // ==========================================
+        // COMPONENTS
+        // ==========================================
+
+        const Header = ({ onNavigate, onToggleMenu }) => {
+            const [scrolled, setScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setScrolled(window.scrollY > 50);
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <header
+                    className={`fixed left-0 right-0 top-0 z-[60] transition-all duration-300 border-b ${scrolled
+                        ? 'bg-nitro-black/80 backdrop-blur-md py-4 border-white/10'
+                        : 'bg-transparent py-6 border-transparent'
+                        }`}
+                >
+                    <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8">
+                        <button
+                            onClick={() => onNavigate('home')}
+                            className="flex items-center gap-3 group text-xl font-bold tracking-tighter"
+                        >
+                            ALKISS.
+                        </button>
+
+                        <nav className="hidden md:block">
+                            <ul className="flex items-center gap-8 text-sm font-medium text-nitro-muted">
+                                <li>
+                                    <button onClick={() => onNavigate('prints')} className="transition-colors hover:text-white">
+                                        Prints
+                                    </button>
+                                </li>
+                                <li>
+                                    <button onClick={() => onNavigate('about')} className="transition-colors hover:text-white">
+                                        About
+                                    </button>
+                                </li>
+                                <li>
+                                    <a
+                                        href={CONTACT_EMAIL}
+                                        className="rounded-full bg-white px-5 py-2 text-nitro-black transition-transform hover:scale-105 active:scale-95"
+                                    >
+                                        Contact
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <button
+                            onClick={onToggleMenu}
+                            className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition-colors hover:bg-white/10 md:hidden"
+                        >
+                            <span>Menu</span>
+                            <MenuIcon className="h-4 w-4" />
+                        </button>
+                    </div>
+                </header>
+            );
+        };
+
+        const MobileMenu = ({ isOpen, onClose, onNavigate }) => {
+            const handleNav = (view) => {
+                onNavigate(view);
+                onClose();
+            };
+
+            return (
+                <div
+                    className={`fixed inset-0 z-[60] bg-nitro-black transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                        }`}
+                >
+                    <div className="flex flex-col h-full p-6">
+                        <div className="flex justify-between items-center mb-12">
+                            <div className="flex items-center gap-3 font-bold text-xl">
+                                ALKIS.
+                            </div>
+                            <button onClick={onClose} className="p-2 text-white/70 hover:text-white">
+                                <XIcon className="h-6 w-6" />
+                            </button>
+                        </div>
+                        <nav className="flex-1 flex flex-col justify-center items-center gap-8 text-2xl font-medium text-nitro-muted">
+                            <button onClick={() => handleNav('home')} className="hover:text-white">
+                                Home
+                            </button>
+                            <button onClick={() => handleNav('prints')} className="hover:text-white">
+                                Prints
+                            </button>
+                            <button onClick={() => handleNav('about')} className="hover:text-white">
+                                About
+                            </button>
+                            <a href={CONTACT_EMAIL} className="text-white/50 hover:text-white">
+                                Contact
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            );
+        };
+
+        const Hero = () => {
+            const [roleIndex, setRoleIndex] = useState(0);
+            const [tiltStyle, setTiltStyle] = useState({});
+            const containerRef = useRef(null);
+
+            // Text Cycling
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    setRoleIndex((prev) => (prev + 1) % ROLES.length);
+                }, 2500);
+                return () => clearInterval(interval);
+            }, []);
+
+            // 3D Tilt Effect
+            useEffect(() => {
+                const updateTilt = (clientX, clientY) => {
+                    if (!containerRef.current) return;
+                    const x = (clientX / window.innerWidth) * 2 - 1;
+                    const y = (clientY / window.innerHeight) * 2 - 1;
+                    setTiltStyle({
+                        transform: `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) rotateZ(6deg) translateZ(20px)`,
+                    });
+                };
+
+                const handleMouseMove = (e) => {
+                    updateTilt(e.clientX, e.clientY);
+                };
+
+                const handleTouchMove = (e) => {
+                    if (e.touches.length > 0) {
+                        updateTilt(e.touches[0].clientX, e.touches[0].clientY);
+                    }
+                };
+
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('touchmove', handleTouchMove);
+
+                return () => {
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('touchmove', handleTouchMove);
+                };
+            }, []);
+
+            return (
+                <section ref={containerRef} className="relative flex min-h-[70vh] flex-col justify-center">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <div className="flex flex-col gap-2 z-10 order-2 lg:order-1">
+                            <h1 className="text-6xl font-bold tracking-tighter text-white sm:text-8xl lg:text-[7rem] leading-[1.15] sm:leading-[1.15]">
+                                Hey, I am a <br />
+                                <span
+                                    key={roleIndex}
+                                    className="inline-block animate-reveal text-[#FF2424] pb-3"
+                                >
+                                    {ROLES[roleIndex]}
+                                </span>
+                                <br />
+                                Designer
+                            </h1>
+                            <div className="flex items-center gap-3 mt-4">
+                                <div className="relative flex h-3 w-3 items-center justify-center">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                                </div>
+                                <p className="text-lg font-medium text-nitro-muted sm:text-xl">
+                                    available for new projects
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="order-1 lg:order-2 flex justify-center lg:justify-end perspective-1000">
+                            <div
+                                className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-[500px] lg:h-[500px] transition-transform duration-100 ease-out"
+                                style={tiltStyle}
+                            >
+                                <div className="absolute inset-0 bg-[#FF2424] opacity-20 blur-[100px] rounded-full"></div>
+                                <img
+                                    src="assets/cursorimage.png"
+                                    alt="Abstract 3D Shape"
+                                    className="relative z-10 w-full h-full object-cover rounded-3xl shadow-2xl"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="absolute bottom-0 right-0 hidden sm:block">
+                        <div className="flex flex-col items-center gap-2 text-xs uppercase tracking-widest text-nitro-muted">
+                            <span>Scroll</span>
+                            <ArrowDown className="h-4 w-4 animate-bounce" />
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const ProjectStack = ({ projects, onSelectProject }) => {
+            return (
+                <section className="relative flex flex-col items-center gap-12 py-12">
+                    <div className="flex w-full items-center justify-between pb-8">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted">
+                            Selected Work
+                        </h2>
+                        <span className="text-sm text-nitro-muted">{projects.length} Projects</span>
+                    </div>
+                    <div className="w-full">
+                        {projects.map((project, index) => {
+                            const total = projects.length;
+                            const topOffset = 100 + index * 20;
+                            const marginBottom = (total - index) * 20 + 20;
+
+                            return (
+                                <div
+                                    key={project.id}
+                                    onClick={() => onSelectProject(project)}
+                                    className="sticky w-full cursor-pointer transition-transform duration-500 ease-out md:hover:-translate-y-4"
+                                    style={{
+                                        top: `${topOffset}px`,
+                                        zIndex: index + 1,
+                                        height: `calc(100dvh - ${topOffset}px - 24px)`,
+                                        marginBottom: `${marginBottom}px`,
+                                    }}
+                                >
+                                    <div
+                                        className={`relative overflow-hidden rounded-[2rem] ${project.bgColor} ${project.textColor} flex flex-col h-full shadow-2xl`}
+                                    >
+                                        <div className="flex w-full items-center justify-between p-6 sm:p-8 border-b border-current/10 shrink-0">
+                                            <span className="text-xs sm:text-sm font-medium uppercase tracking-wide opacity-80">
+                                                {project.year}
+                                            </span>
+                                            <span className="text-xs sm:text-sm font-medium uppercase tracking-wide opacity-80">
+                                                {project.category}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex w-full items-end justify-between px-6 pt-4 pb-6 sm:px-8 sm:pb-8 shrink-0">
+                                            <h3 className="text-4xl font-bold tracking-tight sm:text-6xl md:text-8xl leading-[0.95] -ml-1 truncate pr-4 pb-2">
+                                                {project.title}
+                                            </h3>
+                                            <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-full border border-current/20 bg-transparent transition-transform duration-300 hover:scale-110">
+                                                <ArrowUpRight className="h-6 w-6 sm:h-8 sm:w-8" />
+                                            </div>
+                                        </div>
+
+                                        <div className="relative flex-1 w-full px-6 pb-12 sm:px-8 sm:pb-20 min-h-0">
+                                            <div className="h-full w-full overflow-hidden rounded-2xl bg-black/5">
+                                                <img
+                                                    src={project.image}
+                                                    alt={project.title}
+                                                    className="h-full w-full object-cover object-top transition-transform duration-700 ease-out hover:scale-105"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+            );
+        };
+
+        const ProjectDetail = ({ project, onClose }) => {
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, []);
+
+            return (
+                <div className="animate-reveal relative min-h-screen bg-nitro-black text-white">
+                    <div className="mx-auto max-w-[1400px] px-4 pt-32 pb-24 sm:px-6 lg:px-8">
+                        <div className="mb-16 flex flex-col gap-12">
+                            <h1 className="text-7xl font-bold tracking-tighter sm:text-9xl text-white">
+                                {project.title}
+                            </h1>
+                            <div className="grid grid-cols-2 gap-8 border-t border-white/10 pt-8 sm:grid-cols-4">
+                                <div>
+                                    <span className="mb-2 block text-xs uppercase tracking-widest text-nitro-muted">
+                                        Client
+                                    </span>
+                                    <span className="text-lg font-medium">{project.details.client}</span>
+                                </div>
+                                <div>
+                                    <span className="mb-2 block text-xs uppercase tracking-widest text-nitro-muted">
+                                        Service
+                                    </span>
+                                    <span className="text-lg font-medium">{project.details.services}</span>
+                                </div>
+                                <div>
+                                    <span className="mb-2 block text-xs uppercase tracking-widest text-nitro-muted">
+                                        Year
+                                    </span>
+                                    <span className="text-lg font-medium">{project.year}</span>
+                                </div>
+                                <div>
+                                    <span className="mb-2 block text-xs uppercase tracking-widest text-nitro-muted">
+                                        Category
+                                    </span>
+                                    <span className="text-lg font-medium">{project.category}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-24 w-full overflow-hidden rounded-3xl bg-gray-900">
+                            <img
+                                src={project.image}
+                                alt={project.title}
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 mb-32 border-t border-white/10 pt-16">
+                            <div className="space-y-8">
+                                <h3 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted">
+                                    {project.details.problemTitle || 'The Problem'}
+                                </h3>
+                                <div>
+                                    <p className="text-2xl sm:text-3xl font-medium leading-snug text-white">
+                                        {project.details.challenge}
+                                    </p>
+                                    {project.details.problemSubheader && (
+                                        <p className="text-lg font-bold mt-2 text-nitro-muted">
+                                            {project.details.problemSubheader}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="text-lg text-gray-400 leading-relaxed">
+                                    {project.details.problemBody || (
+                                        "In a market saturated with noise, standing out requires more than just good looks. It demands a clear purpose and a visual language that speaks directly to the user's needs without shouting."
+                                    )}
+                                </div>
+                            </div>
+                            <div className="space-y-8">
+                                <h3 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted">
+                                    {project.details.solutionTitle || 'The Solution'}
+                                </h3>
+                                <p className="text-2xl sm:text-3xl font-medium leading-snug text-white">
+                                    {project.details.solution}
+                                </p>
+                                <div className="text-lg text-gray-400 leading-relaxed">
+                                    {project.details.solutionBody || (
+                                        "We stripped away the non-essentials to focus on core functionality. By utilizing a high-contrast system and intuitive motion design, we created an experience that feels both effortless and distinct."
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-16 sm:gap-x-8">
+                            {project.details.images.map((imgItem, i) => {
+                                const { url, caption, layout = 'half' } = imgItem;
+                                const isFullWidth = layout === 'full' || layout === 'split';
+                                const colSpan = isFullWidth ? 'md:col-span-2' : 'md:col-span-1';
+
+                                return (
+                                    <div key={i} className={`${colSpan} flex flex-col gap-4`}>
+                                        <div className="w-full rounded-2xl bg-white/5 overflow-hidden">
+                                            <img
+                                                src={url}
+                                                alt={caption || ""}
+                                                className="w-full h-auto block transition-transform duration-700 hover:scale-[1.01]"
+                                            />
+                                        </div>
+                                        {caption && (
+                                            <p className="text-sm font-medium text-nitro-muted leading-relaxed px-1">
+                                                {caption}
+                                            </p>
+                                        )}
+                                    </div>
+                                )
+                            })}
+                        </div>
+
+                        <div className="mt-32 border-t border-white/10 pt-24 text-center">
+                            <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-nitro-muted">
+                                Navigate
+                            </p>
+                            <button
+                                onClick={onClose}
+                                className="group inline-flex items-center gap-4 text-6xl font-bold text-white transition-opacity hover:opacity-50 sm:text-8xl"
+                            >
+                                <span>Back Home</span>
+                                <ArrowRight className="h-16 w-16 transition-transform group-hover:translate-x-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const PrintList = ({ prints, onSelectPrint }) => {
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, []);
+
+            return (
+                <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto animate-reveal">
+                    <div className="mb-16 border-b border-white/10 pb-8">
+                        <h1 className="text-6xl font-bold tracking-tighter text-white sm:text-8xl">
+                            Prints
+                        </h1>
+                        <p className="mt-4 text-xl text-nitro-muted">
+                            A collection of independent publications and digital forms.
+                        </p>
+                    </div>
+                    <div className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+                        {prints.map((print) => (
+                            <div
+                                key={print.id}
+                                className="group cursor-pointer"
+                                onClick={() => onSelectPrint(print)}
+                            >
+                                <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-white/5 mb-6 relative">
+                                    <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10 z-10"></div>
+                                    <img
+                                        src={print.image}
+                                        alt={print.title}
+                                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                    />
+                                    <div className="absolute bottom-4 right-4 z-20 opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                                        <span className="bg-white text-black text-sm font-bold px-4 py-2 rounded-full">
+                                            View
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-baseline">
+                                    <h3 className="text-xl font-medium text-white group-hover:text-nitro-muted transition-colors">
+                                        {print.title}
+                                    </h3>
+                                    <span className="text-white font-semibold">{print.price}</span>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-white bg-white/10 px-2 py-0.5 rounded">
+                                        {print.type}
+                                    </span>
+                                    <p className="text-sm text-nitro-muted">{print.size}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const PrintDetail = ({ print, onClose }) => {
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, []);
+
+            const contactSubject = encodeURIComponent(`Purchase Inquiry: ${print.title}`);
+            const contactBody = encodeURIComponent(
+                `Hi, I'm interested in purchasing "${print.title}". Please let me know the next steps.`
+            );
+            const emailOnly = CONTACT_EMAIL.replace('mailto:', '');
+            const mailtoLink = `mailto:${emailOnly}?subject=${contactSubject}&body=${contactBody}`;
+
+            return (
+                <div className="min-h-screen bg-nitro-black pt-24 animate-reveal">
+                    <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 pb-24">
+                        <button
+                            onClick={onClose}
+                            className="flex items-center gap-2 text-nitro-muted hover:text-white mb-8 transition-colors text-sm uppercase tracking-widest font-semibold"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to Prints
+                        </button>
+
+                        <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
+                            <div className="lg:col-span-7 flex flex-col gap-8">
+                                {print.previewImages.map((img, index) => (
+                                    <div key={index} className="w-full bg-white/5 rounded-2xl overflow-hidden">
+                                        <img
+                                            src={img}
+                                            alt={`Preview ${index + 1}`}
+                                            className="w-full h-auto object-cover"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="lg:col-span-5 relative">
+                                <div className="sticky top-32 flex flex-col gap-8">
+                                    <div>
+                                        <span className="inline-block px-3 py-1 rounded border border-white/10 text-xs font-bold uppercase tracking-widest text-nitro-muted mb-4">
+                                            {print.type}
+                                        </span>
+                                        <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 leading-tight">
+                                            {print.title}
+                                        </h1>
+                                        <p className="text-2xl font-medium text-white">{print.price}</p>
+                                    </div>
+                                    <div className="border-t border-white/10 pt-8">
+                                        <p className="text-lg leading-relaxed text-gray-300 mb-8">
+                                            {print.description}
+                                        </p>
+                                        <div className="space-y-4 mb-8">
+                                            <h3 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted">
+                                                Specifications
+                                            </h3>
+                                            <ul className="space-y-2 text-sm text-gray-400">
+                                                <li className="flex justify-between border-b border-white/5 pb-2">
+                                                    <span>Dimensions</span>
+                                                    <span className="text-white">{print.size}</span>
+                                                </li>
+                                                {print.specs.map((spec, i) => (
+                                                    <li
+                                                        key={i}
+                                                        className="flex justify-between border-b border-white/5 pb-2"
+                                                    >
+                                                        <span>Feature</span>
+                                                        <span className="text-white">{spec}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <a
+                                        href={mailtoLink}
+                                        className="w-full bg-white text-black font-bold text-lg py-4 rounded-full flex items-center justify-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                                    >
+                                        <span>Contact to Purchase</span>
+                                        <Mail className="h-5 w-5" />
+                                    </a>
+                                    <p className="text-xs text-center text-gray-500">
+                                        Inquire for shipping rates and availability. <br />
+                                        Printed responsibly on FSC certified paper.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const About = () => {
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, []);
+
+            return (
+                <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto animate-reveal">
+                    <div className="grid gap-16 lg:grid-cols-12 mb-24">
+                        <div className="lg:col-span-5">
+                            <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-gray-800">
+                                <img
+                                    src="assets/alkisphoto"
+                                    alt="Portrait"
+                                    className="h-full w-full object-cover grayscale transition-all hover:grayscale-0 duration-700"
+                                />
+                            </div>
+                        </div>
+                        <div className="lg:col-span-7 flex flex-col justify-center">
+                            <h1 className="text-6xl font-bold tracking-tighter text-white mb-8 sm:text-7xl">
+                                I'm Alkis.
+                            </h1>
+                            <p className="text-2xl leading-relaxed text-gray-300 mb-8">
+                                A designer and creator based in Athens, Greece. My work lies at the intersection of tangible print design and modern website development. My approach is uniquely informed by my studies in Optical Communication and Design at the University of West Attica, giving me a rigorous, analytical perspective on visual information and digital clarity. I specialize in building crisp, functional online experiences while maintaining a passion for high fidelity printed design.
+                            </p>
+                            <p className="text-lg leading-relaxed text-nitro-muted">
+                                My professional background includes collaborating with diverse businesses, where I have helped translate brand vision into tangible outcomes, often utilizing new technologies and innovative digital solutions. Beyond the screen, I am also a practicing painter. This artistic perspective fuels my design work, ensuring that every project whether it's a website layout or a print asset possesses a strong, intentional aesthetic and a powerful sense of visual storytelling. I am dedicated to creating work that is both beautiful and built to last.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-white/10 pt-16">
+                        <h2 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted mb-12">
+                            Capabilities
+                        </h2>
+                        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="space-y-4 rounded-2xl bg-white/5 p-6 border border-white/5 hover:bg-white/10 transition-colors">
+                                <h3 className="font-bold text-white text-xl">Brand Identity & Logo Design</h3>
+                                <p className="text-sm text-gray-400">
+                                    Developing comprehensive brand identities, including logo design, visual systems, color palettes, and foundational brand guidelines.
+                                </p>
+                            </div>
+                            <div className="space-y-4 rounded-2xl bg-white/5 p-6 border border-white/5 hover:bg-white/10 transition-colors">
+                                <h3 className="font-bold text-white text-xl">Graphic Design (Print)</h3>
+                                <p className="text-sm text-gray-400">
+                                    Expertise in designing and preparing high-quality materials for print, such as Posters, Magazines, Brochures, and other promotional collateral.
+                                </p>
+                            </div>
+                            <div className="space-y-4 rounded-2xl bg-white/5 p-6 border border-white/5 hover:bg-white/10 transition-colors">
+                                <h3 className="font-bold text-white text-xl">Digital Design & Asset Creation</h3>
+                                <p className="text-sm text-gray-400">
+                                    Creating compelling visual assets for digital platforms, including website graphics, social media content, and digital advertisements.
+                                </p>
+                            </div>
+                            <div className="space-y-4 rounded-2xl bg-white/5 p-6 border border-white/5 hover:bg-white/10 transition-colors">
+                                <h3 className="font-bold text-white text-xl">Web Development (CMS)</h3>
+                                <p className="text-sm text-gray-400">
+                                    Building, launching, and managing functional, user-friendly websites using the WordPress platform.
+                                </p>
+                            </div>
+                            <div className="space-y-4 rounded-2xl bg-white/5 p-6 border border-white/5 hover:bg-white/10 transition-colors">
+                                <h3 className="font-bold text-white text-xl">Front-End Tools & Code</h3>
+                                <p className="text-sm text-gray-400">
+                                    Utilizing tools like Vibe Code (or equivalent development environments) for custom web creation, maintenance, and basic front-end implementation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-24 grid gap-12 lg:grid-cols-2">
+                        <div>
+                            <h2 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted mb-8">
+                                Experience
+                            </h2>
+                            <ul className="space-y-6">
+                                <li className="flex justify-between items-start border-b border-white/10 pb-4">
+                                    <div className="flex flex-col pr-4">
+                                        <span className="text-white font-medium">Freelance Designer</span>
+                                        <span className="text-sm text-gray-400 mt-1">Began freelancing career.</span>
+                                    </div>
+                                    <span className="text-nitro-muted whitespace-nowrap">2023 — Present</span>
+                                </li>
+                                <li className="flex justify-between items-start border-b border-white/10 pb-4">
+                                    <div className="flex flex-col pr-4">
+                                        <span className="text-white font-medium">Designer, Icons for Good</span>
+                                        <span className="text-sm text-gray-400 mt-1">Began work on icon design projects.</span>
+                                    </div>
+                                    <span className="text-nitro-muted whitespace-nowrap">2023</span>
+                                </li>
+                                <li className="flex justify-between items-start border-b border-white/10 pb-4">
+                                    <div className="flex flex-col pr-4">
+                                        <span className="text-white font-medium">University of West Attica</span>
+                                        <span className="text-sm text-gray-400 mt-1">Accepted into the Design and Optical Communication program.</span>
+                                    </div>
+                                    <span className="text-nitro-muted whitespace-nowrap">2023 — Present</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-semibold uppercase tracking-widest text-nitro-muted mb-8">
+                                Selected Clients
+                            </h2>
+                            <div className="grid grid-cols-1 gap-4 text-gray-400">
+                                <p>Icons for good</p>
+                                <p>Seed of life Cyprus</p>
+                                <p>Seed of life Japan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Footer = ({ onNavigate }) => {
+            return (
+                <footer
+                    id="contact"
+                    className="relative overflow-hidden rounded-t-3xl bg-nitro-dark border-t border-white/10 pt-24 pb-12"
+                >
+                    <div className="flex flex-col items-center text-center">
+                        <h2 className="mb-8 text-6xl font-bold tracking-tighter text-white sm:text-8xl lg:text-9xl">
+                            Say Hello
+                        </h2>
+                        <a
+                            href={CONTACT_EMAIL}
+                            className="group relative inline-flex items-center gap-4 rounded-full bg-white px-8 py-4 text-lg font-bold text-black transition-transform hover:scale-105 hover:bg-gray-200"
+                        >
+                            <span>Let's start a project</span>
+                            <Mail className="h-5 w-5 transition-transform group-hover:rotate-12" />
+                        </a>
+                    </div>
+                    <div className="mt-32 grid gap-8 border-t border-white/10 pt-12 sm:grid-cols-2 lg:grid-cols-4 px-8">
+                        <div className="flex flex-col gap-4">
+                            <span className="text-sm font-semibold uppercase text-nitro-muted">
+                                Navigation
+                            </span>
+                            <nav className="flex flex-col gap-2 items-start">
+                                <button
+                                    onClick={() => onNavigate('home')}
+                                    className="text-nitro-text hover:text-white text-left"
+                                >
+                                    Home
+                                </button>
+                                <button
+                                    onClick={() => onNavigate('prints')}
+                                    className="text-nitro-text hover:text-white text-left"
+                                >
+                                    Prints
+                                </button>
+                                <button
+                                    onClick={() => onNavigate('about')}
+                                    className="text-nitro-text hover:text-white text-left"
+                                >
+                                    About
+                                </button>
+                            </nav>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <span className="text-sm font-semibold uppercase text-nitro-muted">
+                                Socials
+                            </span>
+                            <div className="flex gap-4">
+                                <a
+                                    href="https://www.facebook.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-nitro-text hover:text-white"
+                                >
+                                    <Facebook className="h-5 w-5" />
+                                </a>
+                                <a
+                                    href="https://www.linkedin.com/feed/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-nitro-text hover:text-white"
+                                >
+                                    <Linkedin className="h-5 w-5" />
+                                </a>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:col-span-2 lg:text-right">
+                            <span className="text-sm font-semibold uppercase text-nitro-muted">
+                                Location
+                            </span>
+                            <p className="text-nitro-text">
+                                Athens, Greece
+                                <br />
+                                Remote Available
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        const App = () => {
+            // State
+            const [view, setView] = useState('home');
+            const [selectedProject, setSelectedProject] = useState(null);
+            const [selectedPrint, setSelectedPrint] = useState(null);
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+            // Data State (Simulating fetch)
+            const [projects, setProjects] = useState([]);
+            const [prints, setPrints] = useState([]);
+
+            // Fetch Data Effect
+            useEffect(() => {
+                const loadData = async () => {
+                    // Simulate network delay
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    setProjects(FALLBACK_PROJECTS);
+                    setPrints(FALLBACK_PRINTS);
+                };
+                loadData();
+            }, []);
+
+            // Navigation Handlers
+            const handleNavigate = (newView) => {
+                setView(newView);
+                setSelectedProject(null);
+                setSelectedPrint(null);
+                window.scrollTo(0, 0);
+            };
+
+            const handleSelectProject = (project) => {
+                setSelectedProject(project);
+            };
+
+            const handleCloseProject = () => {
+                setSelectedProject(null);
+            };
+
+            const handleSelectPrint = (print) => {
+                setSelectedPrint(print);
+            };
+
+            const handleClosePrint = () => {
+                setSelectedPrint(null);
+            };
+
+            // Render Logic
+            const renderMainContent = () => {
+                if (selectedProject) {
+                    return <ProjectDetail project={selectedProject} onClose={handleCloseProject} />;
+                }
+
+                if (selectedPrint) {
+                    return <PrintDetail print={selectedPrint} onClose={handleClosePrint} />;
+                }
+
+                switch (view) {
+                    case 'home':
+                        return (
+                            <div className="flex flex-col gap-24 pb-24 pt-32 sm:gap-32 sm:pt-40">
+                                <Hero />
+                                <ProjectStack projects={projects} onSelectProject={handleSelectProject} />
+                            </div>
+                        );
+                    case 'prints':
+                        return <PrintList prints={prints} onSelectPrint={handleSelectPrint} />;
+                    case 'about':
+                        return <About />;
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-nitro-black text-nitro-text font-sans selection:bg-white/20 selection:text-white">
+                    <Header onNavigate={handleNavigate} onToggleMenu={() => setIsMenuOpen(true)} />
+
+                    <main className={!selectedProject && !selectedPrint ? "mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8" : ""}>
+                        {renderMainContent()}
+                    </main>
+
+                    {!selectedProject && !selectedPrint && (
+                        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+                            <Footer onNavigate={handleNavigate} />
+                        </div>
+                    )}
+
+                    <MobileMenu
+                        isOpen={isMenuOpen}
+                        onClose={() => setIsMenuOpen(false)}
+                        onNavigate={handleNavigate}
+                    />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
